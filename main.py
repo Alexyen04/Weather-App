@@ -1,3 +1,5 @@
+import tkinter as tk
+from tkinter import ttk
 import datetime as dt
 import requests 
 
@@ -55,3 +57,11 @@ print(naive_currentTime)
 
 #print(f"Temperature in {CITY}: {tempCelsius:.2f}°C or {tempFahrenheit:2f}°F")
 #print(f"Temperature in {CITY} feels like: {feelsLikeTempCelsius:.2f}°C or {feelsLikeTempFahrenheit:.2f}°F")
+
+# window
+window = tk.Tk()
+window.title('Weather App')
+window.geometry('500x750')
+
+# run
+window.mainloop()

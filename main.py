@@ -81,15 +81,15 @@ def search(event=None):
     response = requests.get(url).json()
 
     #labels
-    temp = tk.Label(root, text= f"Temperature: {tempFahrenheit:.2f}°F", background= 'pink')
-    feelsTemp = tk.Label(root, text= f"Feels Like Temperature: {feelsLikeTempFahrenheit:.2f}°F", background= 'pink')
-    pressureLabel = tk.Label(root, text= f"Pressure: {pressure}", background= 'pink')
-    humidityLabel = tk.Label(root, text= f"Humidity: {humidity}", background= 'pink')
-    seaLevelLabel = tk.Label(root, text= f"Sea Level: {seaLevel}", background= 'pink')
-    descriptionLabel = tk.Label(root, text= f"Description: {description}", background= 'pink')
-    windSpeedLabel = tk.Label(root, text= f"WindSpeed: {windSpeed}", background= 'pink')
-    lowTempLabel = tk.Label(root, text= f"Low: {tempMinFahrenheit:.2f}°F", background= 'pink')
-    highTempLabel = tk.Label(root, text= f"High: {tempMaxFahrenheit:.2f}°F", background= 'pink')
+    temp = tk.Label(root, text= f"{tempFahrenheit:.2f}°F", background= 'pink', font= ('Roman',50))
+    feelsTemp = tk.Label(root, text= f"Feels Like Temperature: {feelsLikeTempFahrenheit:.2f}°F", background= 'pink', font= ('Roman',25))
+    pressureLabel = tk.Label(root, text= f"Pressure: {pressure}", background= 'pink', font= ('Roman',25))
+    humidityLabel = tk.Label(root, text= f"Humidity: {humidity}", background= 'pink', font= ('Roman',25))
+    seaLevelLabel = tk.Label(root, text= f"Sea Level: {seaLevel}", background= 'pink', font= ('Roman',25))
+    descriptionLabel = tk.Label(root, text= f"{description}", background= 'pink', font= ('Roman',25))
+    windSpeedLabel = tk.Label(root, text= f"WindSpeed: {windSpeed}", background= 'pink', font= ('Roman',25))
+    lowTempLabel = tk.Label(root, text= f"L: {tempMinFahrenheit:.2f}°F", background= 'pink', font= ('Roman',25))
+    highTempLabel = tk.Label(root, text= f"H: {tempMaxFahrenheit:.2f}°F", background= 'pink', font= ('Roman',25))
 
     #grid
     temp.grid(row= 1, columnspan= 2, sticky= 'nsew')

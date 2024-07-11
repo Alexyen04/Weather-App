@@ -23,6 +23,10 @@ humidity = None
 seaLevel = None
 deascription = None
 windSpeed = None
+clouds = 0
+only_currentTime = None
+sunsetTime = None
+sunriseTime = None
 
 def kelvinToCelciusAndFahrenheit(kelvin) :
     celsius = kelvin -273.15
@@ -31,7 +35,8 @@ def kelvinToCelciusAndFahrenheit(kelvin) :
 
 def setData(city): 
     global tempFahrenheit, tempCelsius, feelsLikeTempFahrenheit, feelsLikeTempCelsius
-    global pressure, humidity, seaLevel, description, windSpeed
+    global pressure, humidity, seaLevel, description, windSpeed, clouds
+    global sunriseTime, sunsetTime, only_currentTime
 
     url = BASE_URL + "appid=" + API_KEY + "&q=" + city
     response = requests.get(url).json()
@@ -75,6 +80,7 @@ def setData(city):
     timezoneDifference = response['timezone']
     currentTime = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(seconds=timezoneDifference))
     naive_currentTime = currentTime.replace(tzinfo=None)
+
     sunsetTime = "20:00:00"
     sunriseTime = "06:30:00"
     datetime_format = "%H:%M:%S"
@@ -82,22 +88,48 @@ def setData(city):
     sunriseTime = datetime.strptime(sunriseTime, datetime_format)
     only_currentTime = datetime(1900, 1, 1, naive_currentTime.hour, naive_currentTime.minute, naive_currentTime.second)
 
+#create separate function for data req for background if needed
+def set_background() :
+    global background_image, label1
+    image_path = ""
+
+    # Get the directory of the current script
+    script_dir = os.path.dirname(__file__)
+
+
+    if clouds > 50 :
+        image_path = os.path.join(script_dir, "backgrounds", "rainybackground.jpg")
+    elif (only_currentTime > sunsetTime) or (only_currentTime < sunriseTime):
+        image_path = os.path.join(script_dir, "backgrounds", "Nightbackground.jpeg")
+    else :     
+        image_path = os.path.join(script_dir, "backgrounds", "Sunnybackground.jpg")
+
+    if not os.path.exists(image_path):
+        print(f"Error: The file '{image_path}' does not exist.")
+    else:
+        image = Image.open(image_path)
+        resized_image = image.resize((525,775))
+        background_image = ImageTk.PhotoImage(resized_image)
+        label1 = Label(root, image=background_image)
+        label1.place(x=-5, y=-5)
+
 def search():
     global CITY
     CITY = input.get('1.0', tk.END)
     setData(CITY)
+    set_background()
 
     url = BASE_URL + "appid=" + API_KEY + "&q=" + CITY
     response = requests.get(url).json()
 
     #labels
-    temp = tk.Label(root, text= f"Temperature: {tempFahrenheit:.2f}°F", background= 'pink')
-    feelsTemp = tk.Label(root, text= f"Feels Like Temperature: {feelsLikeTempFahrenheit:.2f}°F", background= 'pink')
-    pressureLabel = tk.Label(root, text= f"Pressure: {pressure}", background= 'pink')
-    humidityLabel = tk.Label(root, text= f"Humidity: {humidity}", background= 'pink')
-    seaLevelLabel = tk.Label(root, text= f"Sea Level: {seaLevel}", background= 'pink')
-    descriptionLabel = tk.Label(root, text= f"Description: {description}", background= 'pink')
-    windSpeedLabel = tk.Label(root, text= f"WindSpeed: {windSpeed}", background= 'pink')
+    temp = tk.Label(root, text= f"Temperature: {tempFahrenheit:.2f}°F")
+    feelsTemp = tk.Label(root, text= f"Feels Like Temperature: {feelsLikeTempFahrenheit:.2f}°F")
+    pressureLabel = tk.Label(root, text= f"Pressure: {pressure}")
+    humidityLabel = tk.Label(root, text= f"Humidity: {humidity}")
+    seaLevelLabel = tk.Label(root, text= f"Sea Level: {seaLevel}")
+    descriptionLabel = tk.Label(root, text= f"Description: {description}")
+    windSpeedLabel = tk.Label(root, text= f"WindSpeed: {windSpeed}")
 
     #grid
     temp.grid(row= 1, columnspan= 2, sticky= 'nsew')
@@ -110,45 +142,35 @@ def search():
 
     print(response)
 
-def set_background() :
-    print(only_currentTime)
-    if clouds > 50 :
-        image_path = os.path.join(script_dir, "backgrounds", "rainybackground.jpg")
-    elif (only_currentTime > sunsetTime) or (only_currentTime < sunriseTime):
-        image_path = os.path.join(script_dir, "backgrounds", "Nightbackground.jpeg")
-    else :     
-        image_path = os.path.join(script_dir, "backgrounds", "Sunnybackground.jpg")
 
-    return image_path
-    
 #Window 
 root = tk.Tk()
 root.title('Weather App')
 root.geometry('500x750')
-
-# background
-# Get the directory of the current script
-script_dir = os.path.dirname(__file__)
-
-# Construct the relative path to the image file based on weather
-image_path = set_background()
-
-if not os.path.exists(image_path):
-    print(f"Error: The file '{image_path}' does not exist.")
-else:
-    # background
-    image = Image.open(image_path)
-    resized_image = image.resize((525,775))
-    background_image = ImageTk.PhotoImage(resized_image)
-    label1 = Label(root, image=background_image)
-    label1.place(x=-5, y=-5)
 
 #input
 input = tk.Text(root, height = 1, font = ('Arial', 15), background= 'pink')
 
 #button
 enterBtn = tk.Button(root, text= "Enter", font = ('Arial', 15), command=search)
+
         
+# background
+
+# Construct the relative path to the image file based on weather
+# image_path = set_background()
+
+# if not os.path.exists(image_path):
+#     print(f"Error: The file '{image_path}' does not exist.")
+# else:
+#     # background
+#     image = Image.open(image_path)
+#     resized_image = image.resize((525,775))
+#     background_image = ImageTk.PhotoImage(resized_image)
+#     label1 = Label(root, image=background_image)
+#     label1.place(x=-5, y=-5)
+
+
 #grid
 root.columnconfigure(0, weight= 3, uniform= 'a')
 root.columnconfigure(1, weight= 1, uniform= 'a')

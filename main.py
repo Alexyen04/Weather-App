@@ -34,7 +34,7 @@ def kelvinToCelciusAndFahrenheit(kelvin) :
     return celsius, fahrenheit
 
 def setData(city): 
-    global tempFahrenheit, tempCelsius, feelsLikeTempFahrenheit, feelsLikeTempCelsius
+    global tempFahrenheit, tempCelsius, feelsLikeTempFahrenheit, feelsLikeTempCelsius, tempMinCelsius, tempMinFahrenheit, tempMaxCelsius, tempMaxFahrenheit
     global pressure, humidity, seaLevel, description, windSpeed, clouds
     global sunriseTime, sunsetTime, only_currentTime
 
@@ -96,7 +96,6 @@ def set_background() :
     # Get the directory of the current script
     script_dir = os.path.dirname(__file__)
 
-
     if clouds > 50 :
         image_path = os.path.join(script_dir, "backgrounds", "rainybackground.jpg")
     elif (only_currentTime > sunsetTime) or (only_currentTime < sunriseTime):
@@ -112,10 +111,10 @@ def set_background() :
         background_image = ImageTk.PhotoImage(resized_image)
         label1 = Label(root, image=background_image)
         label1.place(x=-5, y=-5)
-
-def search():
+    
+def search(event=None):
     global CITY
-    CITY = input.get('1.0', tk.END)
+    CITY = input.get()
     setData(CITY)
     set_background()
 
@@ -123,25 +122,35 @@ def search():
     response = requests.get(url).json()
 
     #labels
-    temp = tk.Label(root, text= f"Temperature: {tempFahrenheit:.2f}°F")
-    feelsTemp = tk.Label(root, text= f"Feels Like Temperature: {feelsLikeTempFahrenheit:.2f}°F")
-    pressureLabel = tk.Label(root, text= f"Pressure: {pressure}")
-    humidityLabel = tk.Label(root, text= f"Humidity: {humidity}")
-    seaLevelLabel = tk.Label(root, text= f"Sea Level: {seaLevel}")
-    descriptionLabel = tk.Label(root, text= f"Description: {description}")
-    windSpeedLabel = tk.Label(root, text= f"WindSpeed: {windSpeed}")
+    temp = tk.Label(root, text= f"{tempFahrenheit:.2f}°F", background= 'pink', font= ('Roman',50))
+    feelsTemp = tk.Label(root, text= f"Feels Like Temperature: {feelsLikeTempFahrenheit:.2f}°F", background= 'pink', font= ('Roman',25))
+    pressureLabel = tk.Label(root, text= f"Pressure: {pressure}", background= 'pink', font= ('Roman',25))
+    humidityLabel = tk.Label(root, text= f"Humidity: {humidity}", background= 'pink', font= ('Roman',25))
+    seaLevelLabel = tk.Label(root, text= f"Sea Level: {seaLevel}", background= 'pink', font= ('Roman',25))
+    descriptionLabel = tk.Label(root, text= f"{description}", background= 'pink', font= ('Roman',25))
+    windSpeedLabel = tk.Label(root, text= f"WindSpeed: {windSpeed}", background= 'pink', font= ('Roman',25))
+    lowTempLabel = tk.Label(root, text= f"L: {tempMinFahrenheit:.2f}°F", background= 'pink', font= ('Roman',25))
+    highTempLabel = tk.Label(root, text= f"H: {tempMaxFahrenheit:.2f}°F", background= 'pink', font= ('Roman',25))
 
     #grid
     temp.grid(row= 1, columnspan= 2, sticky= 'nsew')
-    feelsTemp.grid(row= 2, columnspan= 2, sticky= 'nsew')
-    pressureLabel.grid(row= 3, columnspan= 2, sticky= 'nsew')
-    humidityLabel.grid(row= 4, columnspan= 2, sticky= 'nsew')
-    seaLevelLabel.grid(row= 5, columnspan= 2, sticky= 'nsew')
-    descriptionLabel.grid(row= 6, columnspan= 2, sticky= 'nsew')
-    windSpeedLabel.grid(row= 7, columnspan= 2, sticky= 'nsew')
+    feelsTemp.grid(row= 2, columnspan= 2, sticky= 'sew')
+    lowTempLabel.grid(row= 3, column= 0, sticky= 'nse')
+    highTempLabel.grid(row= 3, column= 1, sticky= 'nsw')   
+    descriptionLabel.grid(row= 4, columnspan= 2, sticky= 'new')
+
+    pressureLabel.grid(row= 5, column= 0, sticky= 'nsew')
+    humidityLabel.grid(row= 5, column= 1, sticky= 'nsew')
+    seaLevelLabel.grid(row= 6, column= 0, sticky= 'nsew')
+    windSpeedLabel.grid(row= 6, column= 1, sticky= 'nsew')
 
     print(response)
 
+def bind_enter(event):
+    root.bind('<Return>', search)
+
+def unbind_enter(event):
+    root.unbind('<Return>')
 
 #Window 
 root = tk.Tk()
@@ -149,11 +158,11 @@ root.title('Weather App')
 root.geometry('500x750')
 
 #input
-input = tk.Text(root, height = 1, font = ('Arial', 15), background= 'pink')
+input = tk.Entry(root, font = ('Arial', 15), background= 'lightblue')
 
-#button
-enterBtn = tk.Button(root, text= "Enter", font = ('Arial', 15), command=search)
-
+# Bind focus in and out events
+input.bind('<FocusIn>', bind_enter)
+input.bind('<FocusOut>', unbind_enter)
         
 # background
 
@@ -172,12 +181,14 @@ enterBtn = tk.Button(root, text= "Enter", font = ('Arial', 15), command=search)
 
 
 #grid
-root.columnconfigure(0, weight= 3, uniform= 'a')
+root.columnconfigure(0, weight= 1, uniform= 'a')
 root.columnconfigure(1, weight= 1, uniform= 'a')
 
-root.rowconfigure((0,1,2,3,4,5,6,7), weight= 1, uniform= 'a')
+root.rowconfigure(0, weight= 1, uniform= 'a')
+root.rowconfigure(1, weight= 6, uniform= 'a')
+root.rowconfigure((2,3,4), weight= 2, uniform= 'a')
+root.rowconfigure((5,6), weight= 5, uniform= 'a')
 
-input.grid(row= 0, column= 0, sticky= 'nsew')
-enterBtn.grid(row= 0, column= 1, sticky= 'nsew')
+input.grid(row= 0, columnspan= 2, sticky= 'nsew')
 
 root.mainloop()

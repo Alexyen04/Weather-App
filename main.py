@@ -10,6 +10,7 @@ import requests
 BASE_URL = "http://api.openweathermap.org/data/2.5/weather?"
 API_KEY = "d274d311bcd15678b29f58537a8dfa4d"
 CITY = "San Diego"
+placeHolderText = "Search for new Cities"
 tempFahrenheit = None
 tempCelcius = None
 feelsLikeTempFahrenheit = None 
@@ -21,7 +22,7 @@ tempMaxFahrenheit = None
 pressure = None
 humidity = None
 seaLevel = None
-deascription = None
+description = None
 windSpeed = None
 clouds = 0
 only_currentTime = None
@@ -124,7 +125,8 @@ def search(event=None):
     response = requests.get(url).json()
 
     #labels
-    temp = tk.Label(root, text= f"{tempFahrenheit:.2f}°F", background= 'pink', font= ('Roman',50))
+    cityLabel = tk.Label(root, text= f"{CITY}", background= 'pink', font= ('Roman',25))
+    temp = tk.Label(root, text= f"{tempFahrenheit:.2f}°F", background= 'pink', font= ('Roman',70))
     feelsTemp = tk.Label(root, text= f"Feels Like Temperature: {feelsLikeTempFahrenheit:.2f}°F", background= 'pink', font= ('Roman',25))
     pressureLabel = tk.Label(root, text= f"Pressure: {pressure}", background= 'pink', font= ('Roman',25))
     humidityLabel = tk.Label(root, text= f"Humidity: {humidity}", background= 'pink', font= ('Roman',25))
@@ -135,24 +137,38 @@ def search(event=None):
     highTempLabel = tk.Label(root, text= f"H: {tempMaxFahrenheit:.2f}°F", background= 'pink', font= ('Roman',25))
 
     #grid
-    temp.grid(row= 1, columnspan= 2, sticky= 'nsew')
-    feelsTemp.grid(row= 2, columnspan= 2, sticky= 'sew')
-    lowTempLabel.grid(row= 3, column= 0, sticky= 'nse')
-    highTempLabel.grid(row= 3, column= 1, sticky= 'nsw')   
-    descriptionLabel.grid(row= 4, columnspan= 2, sticky= 'new')
+    cityLabel.grid(row=1, columnspan= 2, sticky= 'sew', padx= 0, pady= 0)
+    temp.grid(row= 2, columnspan= 2, sticky= 'new', padx= 0, pady= 0)
+    feelsTemp.grid(row= 3, columnspan= 2, sticky= 'nsew')
+    lowTempLabel.grid(row= 4, column= 0, sticky= 'nse')
+    highTempLabel.grid(row= 4, column= 1, sticky= 'nsw')   
+    descriptionLabel.grid(row= 5, columnspan= 2, sticky= 'new')
 
-    pressureLabel.grid(row= 5, column= 0, sticky= 'nsew')
-    humidityLabel.grid(row= 5, column= 1, sticky= 'nsew')
-    seaLevelLabel.grid(row= 6, column= 0, sticky= 'nsew')
-    windSpeedLabel.grid(row= 6, column= 1, sticky= 'nsew')
+    pressureLabel.grid(row= 6, column= 0, sticky= 'nsew')
+    humidityLabel.grid(row= 6, column= 1, sticky= 'nsew')
+    seaLevelLabel.grid(row= 7, column= 0, sticky= 'nsew')
+    windSpeedLabel.grid(row= 7, column= 1, sticky= 'nsew')
 
     print(response)
 
-def bind_enter(event):
-    root.bind('<Return>', search)
+def on_focus_in(event):
+    if input.get() == placeHolderText:
+        input.delete(0, tk.END)
+        input.config(fg='black')
 
-def unbind_enter(event):
-    root.unbind('<Return>')
+def on_focus_out(event):
+    if input.get() == '':
+        input.insert(0, placeHolderText)
+        input.config(fg='gray')
+
+def search_on_enter(event):
+    search()
+    input.delete(0, tk.END)
+
+def on_click_outside(event):
+    #Check if the click is outside the input widget
+    if not input.winfo_containing(event.x_root, event.y_root) == input:
+        root.focus_set()
 
 #Window 
 root = tk.Tk()
@@ -160,20 +176,26 @@ root.title('Weather App')
 root.geometry('500x750')
 
 #input
-input = tk.Entry(root, font = ('Arial', 15), background= 'lightblue')
 
-# Bind focus in and out events
-input.bind('<FocusIn>', bind_enter)
-input.bind('<FocusOut>', unbind_enter)
+input = tk.Entry(root, font = ('Arial', 15), fg= 'gray')
+input.insert(0, placeHolderText)
+input.bind('<FocusIn>', on_focus_in)
+input.bind('<FocusOut>', on_focus_out)
+input.bind('<Return>', search_on_enter)
 
-# grid
+#Bind mouse click outside the input widget to root window
+root.bind('<Button-1>', on_click_outside)
+        
+#grid
+
 root.columnconfigure(0, weight= 1, uniform= 'a')
 root.columnconfigure(1, weight= 1, uniform= 'a')
 
 root.rowconfigure(0, weight= 1, uniform= 'a')
-root.rowconfigure(1, weight= 6, uniform= 'a')
-root.rowconfigure((2,3,4), weight= 2, uniform= 'a')
-root.rowconfigure((5,6), weight= 5, uniform= 'a')
+root.rowconfigure(1, weight= 0, uniform= 'a')
+root.rowconfigure((2), weight= 6, uniform= 'a')
+root.rowconfigure((3,4,5), weight= 2, uniform= 'a')
+root.rowconfigure((6,7), weight= 5, uniform= 'a')
 
 input.grid(row= 0, columnspan= 2, sticky= 'nsew')
 

@@ -22,7 +22,7 @@ tempMaxFahrenheit = None
 pressure = None
 humidity = None
 seaLevel = None
-deascription = None
+description = None
 windSpeed = None
 
 def kelvinToCelciusAndFahrenheit(kelvin) :
@@ -103,7 +103,8 @@ def search(event=None):
     response = requests.get(url).json()
 
     #labels
-    temp = tk.Label(root, text= f"{tempFahrenheit:.2f}°F", background= 'pink', font= ('Roman',50))
+    cityLabel = tk.Label(root, text= f"{CITY}", background= 'pink', font= ('Roman',25))
+    temp = tk.Label(root, text= f"{tempFahrenheit:.2f}°F", background= 'pink', font= ('Roman',70))
     feelsTemp = tk.Label(root, text= f"Feels Like Temperature: {feelsLikeTempFahrenheit:.2f}°F", background= 'pink', font= ('Roman',25))
     pressureLabel = tk.Label(root, text= f"Pressure: {pressure}", background= 'pink', font= ('Roman',25))
     humidityLabel = tk.Label(root, text= f"Humidity: {humidity}", background= 'pink', font= ('Roman',25))
@@ -114,16 +115,17 @@ def search(event=None):
     highTempLabel = tk.Label(root, text= f"H: {tempMaxFahrenheit:.2f}°F", background= 'pink', font= ('Roman',25))
 
     #grid
-    temp.grid(row= 1, columnspan= 2, sticky= 'nsew')
-    feelsTemp.grid(row= 2, columnspan= 2, sticky= 'sew')
-    lowTempLabel.grid(row= 3, column= 0, sticky= 'nse')
-    highTempLabel.grid(row= 3, column= 1, sticky= 'nsw')   
-    descriptionLabel.grid(row= 4, columnspan= 2, sticky= 'new')
+    cityLabel.grid(row=1, columnspan= 2, sticky= 'sew', padx= 0, pady= 0)
+    temp.grid(row= 2, columnspan= 2, sticky= 'new', padx= 0, pady= 0)
+    feelsTemp.grid(row= 3, columnspan= 2, sticky= 'nsew')
+    lowTempLabel.grid(row= 4, column= 0, sticky= 'nse')
+    highTempLabel.grid(row= 4, column= 1, sticky= 'nsw')   
+    descriptionLabel.grid(row= 5, columnspan= 2, sticky= 'new')
 
-    pressureLabel.grid(row= 5, column= 0, sticky= 'nsew')
-    humidityLabel.grid(row= 5, column= 1, sticky= 'nsew')
-    seaLevelLabel.grid(row= 6, column= 0, sticky= 'nsew')
-    windSpeedLabel.grid(row= 6, column= 1, sticky= 'nsew')
+    pressureLabel.grid(row= 6, column= 0, sticky= 'nsew')
+    humidityLabel.grid(row= 6, column= 1, sticky= 'nsew')
+    seaLevelLabel.grid(row= 7, column= 0, sticky= 'nsew')
+    windSpeedLabel.grid(row= 7, column= 1, sticky= 'nsew')
 
     print(response)
 

@@ -153,22 +153,7 @@ root = tk.Tk()
 root.title('Weather App')
 root.geometry('500x750')
 
-# background
-# Get the directory of the current script
-script_dir = os.path.dirname(__file__)
 
-# Construct the relative path to the image file based on weather
-image_path = set_background()
-
-if not os.path.exists(image_path):
-    print(f"Error: The file '{image_path}' does not exist.")
-else:
-    # background
-    image = Image.open(image_path)
-    resized_image = image.resize((525,775))
-    background_image = ImageTk.PhotoImage(resized_image)
-    label1 = Label(root, image=background_image)
-    label1.place(x=-5, y=-5)
 
 #input
 input = tk.Entry(root, font = ('Arial', 15), fg= 'gray')

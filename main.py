@@ -24,6 +24,10 @@ humidity = None
 seaLevel = None
 description = None
 windSpeed = None
+clouds = 0
+only_currentTime = None
+sunsetTime = None
+sunriseTime = None
 
 def kelvinToCelciusAndFahrenheit(kelvin) :
     celsius = kelvin -273.15
@@ -32,7 +36,8 @@ def kelvinToCelciusAndFahrenheit(kelvin) :
 
 def setData(city): 
     global tempFahrenheit, tempCelsius, feelsLikeTempFahrenheit, feelsLikeTempCelsius, tempMinCelsius, tempMinFahrenheit, tempMaxCelsius, tempMaxFahrenheit
-    global pressure, humidity, seaLevel, description, windSpeed
+    global pressure, humidity, seaLevel, description, windSpeed, clouds
+    global sunriseTime, sunsetTime, only_currentTime
 
     url = BASE_URL + "appid=" + API_KEY + "&q=" + city
     response = requests.get(url).json()
@@ -76,6 +81,7 @@ def setData(city):
     timezoneDifference = response['timezone']
     currentTime = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(seconds=timezoneDifference))
     naive_currentTime = currentTime.replace(tzinfo=None)
+
     sunsetTime = "20:00:00"
     sunriseTime = "06:30:00"
     datetime_format = "%H:%M:%S"
@@ -83,8 +89,14 @@ def setData(city):
     sunriseTime = datetime.strptime(sunriseTime, datetime_format)
     only_currentTime = datetime(1900, 1, 1, naive_currentTime.hour, naive_currentTime.minute, naive_currentTime.second)
 
+#create separate function for data req for background if needed
 def set_background() :
-    print(only_currentTime)
+    global background_image, label1
+    image_path = ""
+
+    # Get the directory of the current script
+    script_dir = os.path.dirname(__file__)
+
     if clouds > 50 :
         image_path = os.path.join(script_dir, "backgrounds", "rainybackground.jpg")
     elif (only_currentTime > sunsetTime) or (only_currentTime < sunriseTime):
@@ -92,12 +104,22 @@ def set_background() :
     else :     
         image_path = os.path.join(script_dir, "backgrounds", "Sunnybackground.jpg")
 
-    return image_path
+    if not os.path.exists(image_path):
+        print(f"Error: The file '{image_path}' does not exist.")
+    else:
+        image = Image.open(image_path)
+        resized_image = image.resize((525,775))
+        background_image = ImageTk.PhotoImage(resized_image)
+        canvas = tk.Canvas(root, width=resized_image.width, height=resized_image.height)
+        canvas.grid(row=0, column=0, columnspan=2, rowspan=7, sticky="nsew")
+        canvas.create_image(0, 0, anchor="nw", image=background_image)
+        canvas.lower("all")
     
 def search(event=None):
     global CITY
     CITY = input.get()
     setData(CITY)
+    set_background()
 
     url = BASE_URL + "appid=" + API_KEY + "&q=" + CITY
     response = requests.get(url).json()
@@ -154,6 +176,7 @@ root.title('Weather App')
 root.geometry('500x750')
 
 #input
+
 input = tk.Entry(root, font = ('Arial', 15), fg= 'gray')
 input.insert(0, placeHolderText)
 input.bind('<FocusIn>', on_focus_in)
@@ -164,6 +187,7 @@ input.bind('<Return>', search_on_enter)
 root.bind('<Button-1>', on_click_outside)
         
 #grid
+
 root.columnconfigure(0, weight= 1, uniform= 'a')
 root.columnconfigure(1, weight= 1, uniform= 'a')
 

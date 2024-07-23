@@ -109,8 +109,10 @@ def set_background() :
         image = Image.open(image_path)
         resized_image = image.resize((525,775))
         background_image = ImageTk.PhotoImage(resized_image)
-        label1 = Label(root, image=background_image)
-        label1.place(x=-5, y=-5)
+        canvas = tk.Canvas(root, width=resized_image.width, height=resized_image.height)
+        canvas.grid(row=0, column=0, columnspan=2, rowspan=7, sticky="nsew")
+        canvas.create_image(0, 0, anchor="nw", image=background_image)
+        canvas.lower("all")
     
 def search(event=None):
     global CITY
@@ -163,24 +165,8 @@ input = tk.Entry(root, font = ('Arial', 15), background= 'lightblue')
 # Bind focus in and out events
 input.bind('<FocusIn>', bind_enter)
 input.bind('<FocusOut>', unbind_enter)
-        
-# background
 
-# Construct the relative path to the image file based on weather
-# image_path = set_background()
-
-# if not os.path.exists(image_path):
-#     print(f"Error: The file '{image_path}' does not exist.")
-# else:
-#     # background
-#     image = Image.open(image_path)
-#     resized_image = image.resize((525,775))
-#     background_image = ImageTk.PhotoImage(resized_image)
-#     label1 = Label(root, image=background_image)
-#     label1.place(x=-5, y=-5)
-
-
-#grid
+# grid
 root.columnconfigure(0, weight= 1, uniform= 'a')
 root.columnconfigure(1, weight= 1, uniform= 'a')
 

@@ -153,8 +153,6 @@ root = tk.Tk()
 root.title('Weather App')
 root.geometry('500x750')
 
-
-
 #input
 input = tk.Entry(root, font = ('Arial', 15), fg= 'gray')
 input.insert(0, placeHolderText)

@@ -10,6 +10,7 @@ import requests
 BASE_URL = "http://api.openweathermap.org/data/2.5/weather?"
 API_KEY = "d274d311bcd15678b29f58537a8dfa4d"
 CITY = "San Diego"
+placeHolderText = "Search for new Cities"
 tempFahrenheit = None
 tempCelcius = None
 feelsLikeTempFahrenheit = None 
@@ -126,11 +127,24 @@ def search(event=None):
 
     print(response)
 
-def bind_enter(event):
-    root.bind('<Return>', search)
+def on_focus_in(event):
+    if input.get() == placeHolderText:
+        input.delete(0, tk.END)
+        input.config(fg='black')
 
-def unbind_enter(event):
-    root.unbind('<Return>')
+def on_focus_out(event):
+    if input.get() == '':
+        input.insert(0, placeHolderText)
+        input.config(fg='gray')
+
+def search_on_enter(event):
+    search()
+    input.delete(0, tk.END)
+
+def on_click_outside(event):
+    #Check if the click is outside the input widget
+    if not input.winfo_containing(event.x_root, event.y_root) == input:
+        root.focus_set()
 
 #Window 
 root = tk.Tk()
@@ -155,20 +169,24 @@ else:
     label1.place(x=-5, y=-5)
 
 #input
-input = tk.Entry(root, font = ('Arial', 15), background= 'lightblue')
+input = tk.Entry(root, font = ('Arial', 15), fg= 'gray')
+input.insert(0, placeHolderText)
+input.bind('<FocusIn>', on_focus_in)
+input.bind('<FocusOut>', on_focus_out)
+input.bind('<Return>', search_on_enter)
 
-# Bind focus in and out events
-input.bind('<FocusIn>', bind_enter)
-input.bind('<FocusOut>', unbind_enter)
+#Bind mouse click outside the input widget to root window
+root.bind('<Button-1>', on_click_outside)
         
 #grid
 root.columnconfigure(0, weight= 1, uniform= 'a')
 root.columnconfigure(1, weight= 1, uniform= 'a')
 
 root.rowconfigure(0, weight= 1, uniform= 'a')
-root.rowconfigure(1, weight= 6, uniform= 'a')
-root.rowconfigure((2,3,4), weight= 2, uniform= 'a')
-root.rowconfigure((5,6), weight= 5, uniform= 'a')
+root.rowconfigure(1, weight= 0, uniform= 'a')
+root.rowconfigure((2), weight= 6, uniform= 'a')
+root.rowconfigure((3,4,5), weight= 2, uniform= 'a')
+root.rowconfigure((6,7), weight= 5, uniform= 'a')
 
 input.grid(row= 0, columnspan= 2, sticky= 'nsew')
 
